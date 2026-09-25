@@ -1,0 +1,19 @@
+services:
+  xagent:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      XAGENT_DATA_DIR: /data
+      XAGENT_CONFIG: /app/config/agent.yaml
+    volumes:
+      - ./config/agent.yaml:/app/config/agent.yaml:ro
+      - xagent-data:/data
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  xagent-data:

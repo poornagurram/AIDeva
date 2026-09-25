@@ -1,0 +1,130 @@
+# xagent strategy config. Copy to config/agent.yaml (`xagent init`) and edit.
+# Secrets never go here - they live in .env.
+
+# approval: every post is drafted ahead of time and waits for your one-tap approval in Telegram.
+#           Safest for your main account (X suspends unattended AI accounts; AI replies need X's approval).
+# autopilot: posts go out without review. Only on an account with X's "Automated" label + bio disclosure.
+mode: approval
+
+account:
+  handle: your_handle            # without @
+  premium: true                  # X Premium unlocks long posts and gets far more reach (Buffer: ~6x median)
+  timezone: America/New_York     # timezone of the AUDIENCE you want to reach, not yours
+
+persona:
+  name: "Your Name"
+  bio: "AI engineer building a SaaS in public. Shipping LLM products, sharing what works and what breaks."
+  audience: "AI engineers, indie hackers and technical founders building products with LLMs"
+  voice: |
+    - Builder-to-builder. Direct, specific, a little dry. Zero hype.
+    - Concrete over abstract: name the tool, the number, the failure mode, the fix.
+    - Opinions are earned by experience; say "I think" when it's a take, not a fact.
+    - Short sentences. No corporate words. No motivational fluff.
+  pillars:
+    - name: build_in_public
+      description: "Honest updates on building the SaaS: decisions, trade-offs, mistakes, lessons (from FACTS/notes only)"
+      weight: 1.2
+    - name: ai_engineering
+      description: "Practical LLM/agent engineering: evals, prompts, tool use, latency, cost, reliability, architecture"
+      weight: 1.5
+    - name: saas_growth
+      description: "Distribution, pricing, onboarding, retention and positioning lessons for technical founders"
+      weight: 1.0
+    - name: industry_takes
+      description: "Sharp, useful takes on what new models, tools and launches actually change for builders"
+      weight: 1.0
+    - name: founder_mindset
+      description: "Focus, shipping speed, decision-making and staying sane as a solo/small-team founder"
+      weight: 0.6
+  # The ONLY personal facts the agent may state. Everything else must be opinion/how-to/industry.
+  # Keep this current: real numbers here (and via /note) make the best-performing posts.
+  facts: |
+    - (add real facts, e.g. "Building <product>, an AI tool for <audience> that <does X>")
+    - (e.g. "Launched <month year>; <N> paying customers" - only if true)
+  banned_topics: [politics, religion, crypto trading, personal attacks, medical advice]
+  banned_phrases: []
+  example_posts:
+    - "Most LLM apps don't have a model problem. They have an eval problem. If you can't measure it, you're just vibing in production."
+    - "Shipped the boring fix today: retries with jitter + idempotency keys. Error rate dropped more than any prompt change this month."
+
+schedule:
+  posts_per_day: 4
+  candidate_hours: [8, 9, 10, 11, 12, 13, 15, 17, 19, 21]
+  jitter_minutes: 12
+  min_gap_minutes: 150
+  formats: [insight, contrarian, list, story, how_to, question, one_liner, news_take, thread, long_post]
+  max_threads_per_day: 1
+  grace_minutes: 45
+  report_local_hour: 22
+
+approval:
+  lead_minutes: 90               # drafts arrive this long before their slot
+  timeout_minutes: 240           # unapproved drafts expire this long after their slot
+
+engagement:
+  # off | approval | auto. X requires prior written approval for AI reply bots: keep "approval" unless you have it.
+  mode: approval
+  poll_minutes: 15
+  max_replies_per_day: 30
+  max_replies_per_user_per_day: 3
+  reply_window_hours: 24
+  min_author_followers: 0
+  ignore_users: []
+
+monetization:
+  cta_every_n_posts: 5           # 1 in 5 posts gets a soft CTA as a self-reply (80/20 value/promo)
+  utm_source: x
+  utm_medium: social
+  utm_campaign: xagent
+  offers:
+    - name: "Newsletter"
+      url: "https://example.com/newsletter"
+      pitch: "A weekly, no-fluff breakdown of what's working in AI engineering and SaaS growth"
+      weight: 2
+    - name: "Product"
+      url: "https://example.com"
+      pitch: "The SaaS I'm building - replace with a one-line description of who it's for and what it does"
+      weight: 1
+    # Affiliate/referral/sponsored links get X's Paid Partnership label automatically:
+    # - name: "Some AI tool (affiliate)"
+    #   url: "https://tool.example/?ref=you"
+    #   pitch: "The tool I use for X"
+    #   affiliate: true
+
+research:
+  enabled: true
+  web_search: true               # Claude searches the live web once a day for fresh niche news
+  max_searches: 5
+  local_hour: 6
+  max_items: 8
+  queries:
+    - "new LLM / AI model releases and what they change for developers"
+    - "AI agents, evals, and LLM engineering practices"
+    - "SaaS and indie hacker news: launches, pricing, acquisitions"
+  rss_feeds:
+    - https://hnrss.org/frontpage?points=150
+
+llm:
+  model: claude-opus-5
+  effort_compose: high
+  effort_judge: high
+  effort_reply: medium
+  effort_research: medium
+  candidates_per_post: 5
+  use_refusal_fallback: true
+
+safety:
+  max_hashtags: 0
+  allow_links_in_main_post: false
+  allow_mentions_in_posts: false
+  max_similarity: 0.62
+  history_window: 400
+  max_weighted_length: 275
+  max_consecutive_failures: 4
+  pause_minutes_on_breaker: 180
+  max_writes_per_day: 60
+  made_with_ai_label: true
+
+budget:
+  x_monthly_usd: 30              # ~4 posts/day + replies + metrics costs ~$10-15 on pay-per-use
+  llm_monthly_usd: 60
