@@ -1,0 +1,29 @@
+# systemd unit for running xagent on a plain VPS without Docker.
+#   sudo useradd --system --create-home --home-dir /opt/xagent xagent
+#   sudo -u xagent git clone <repo> /opt/xagent/app && cd /opt/xagent/app
+#   sudo -u xagent python3 -m venv .venv && sudo -u xagent .venv/bin/pip install .
+#   sudo cp deploy/xagent.service /etc/systemd/system/ && sudo systemctl enable --now xagent
+#   journalctl -u xagent -f
+[Unit]
+Description=xagent - autonomous X growth agent
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=xagent
+WorkingDirectory=/opt/xagent/app
+EnvironmentFile=/opt/xagent/app/.env
+ExecStart=/opt/xagent/app/.venv/bin/xagent run
+Restart=always
+RestartSec=30
+# The agent handles SIGTERM gracefully.
+KillSignal=SIGTERM
+TimeoutStopSec=60
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/opt/xagent/app/data
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
